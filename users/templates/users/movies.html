@@ -1,0 +1,157 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static 'fonts/fontawesome/css/all.min.css' %}" type="text/css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <title>Document</title>
+</head>
+{%if user.is_authenticated%}
+<body>
+    <div id="app">
+        <nav class="navbar navbar-dark bg-dark shadow-lg">
+            <div class="container mt-2 mb-2">
+            <a class="navbar-brand" style="font-size: x-large;" href="#">Movies</a>
+            </div>
+            <div class="col-lg  col-md-6 col-sm-12 col mt-2 mb-2">
+                <div class="input-group w-100 ">
+                    <input type="text" class="form-control" style="width:60%;" placeholder="Search" v-model="keyword">
+                    <div class="input-group-append">
+                        <button class="btn btn-secondary" v-on:click="getkey()"><i class="fa fa-search"></i></button>
+                    </div>
+                </div>
+            </div> <!-- col.// -->
+        </nav>
+    
+        <div class="container">
+            <div class="row mt-5 pt-3">
+                <div class="col-md-4">
+                    <label style="font-weight: bold;">Select Language</label>
+                    <select class="form-control" v-model="language">
+                        <option selected value="English">Choose</option>
+                        <option value="Hindi">Hindi</option>
+                        <option value="English">English</option>
+                        <option value="Marathi">Marathi</option>
+                        <option value="Telugu">Telugu</option>
+                        <option value="Tamil">Tamil</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label style="font-weight: bold;">Select Genre</label>
+                    <select class="form-control" v-model="Genre">
+                        <option selected value="Horror">Choose</option>
+                        <option value="Action">Action</option>
+                        <option value="Comedy">Comedy </option>
+                        <option value="Drama">Drama</option>
+                        <option value="Fantasy">Fantasy</option>
+                        <option value="Horror">Horror</option>
+                        <option value="Romance">Romance</option>
+                        <option value="Thriller">Thriller</option>
+                        <option value="Crime">Crime</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <br>
+                    <button class="btn btn-dark" v-on:click="getRest()">Submit</button>
+                </div>
+                <div class="col-md-2">
+                    <br>
+                    <a href="{% url 'home' %}" class="btn btn-dark">Back to Home</a>
+                </div>
+            </div>
+            <div class="row mt-5 pt-5">
+                <div class="col-md-3 my-3" v-for="movie in movies">
+                    <div class="card shadow-lg md-3" style="width: 18rem;">
+                        <img :src="movie.image"
+                            class="card-img-top" alt=".." style="height:200px; width:250px">
+                        <div class="card-body">
+                            <h5 class="card-title">[[movie.name]] </h5>
+                            <p class="card-text">[[(movie.description).substring(0 , 150)]]...</p>
+                            <i class="fa fa-star">  [[movie.rating]] out of 5</i><br>
+                            <a href="#" class="btn btn-danger text-capitalize btn-sm mt-2">[[movie.language]]</a>
+                            <a href="#" class="btn btn-primary text-capitalize btn-sm mt-2">[[movie.Genre]]</a>
+                            <a href="{% url 'moviereviews' %}" class="btn btn-dark btn-sm mt-2">Add a Review</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            delimiters: ['[[', ']]'],
+            data() {
+                return {
+                    language:'',
+                    Genre:'',
+                    rating:'',
+                    keyword:'',
+                    tasks: [],
+                    movies : [],
+                }
+            },
+            created() {
+                this.getLoad();
+            },
+            methods : {
+                getRest(){
+                    fetch(`/api_m/get/?language=${this.language}&Genre=${this.Genre}`)
+                    .then(result => result.json())
+                    .then(response => {
+                        this.movies = response
+                    })
+                },
+                getkey()
+                {
+                    fetch(`/search_m/?keyword=${this.keyword}`)
+                    .then(result => result.json())
+                    .then(response => {
+                        this.movies = response
+                    })
+                },
+                getLoad(){
+                    fetch(`/load_m`)
+                    .then(result => result.json())
+                    .then(response => {
+                        this.movies = response
+                    })
+                }
+            }
+        });
+    </script>
+
+</body>
+{%else%}
+<body>
+    <br><br><br><br><br><br>
+    <div class="col d-flex justify-content-center" >
+        <div class="card" style="width: 30rem; text-align: center;">
+            <div class="card-body">
+            <main>
+                    <div class="alert alert-dark" role="alert">
+                        <div style="font-size: 150%">
+                                You need to be logged in to visit this page
+                        </div>
+                        <div class="card-footer text-center">
+                            <div class="small">
+                                <a href="{% url 'login' %}">
+                                    Go to the login page</a>
+                            </div>
+                        </div>
+                    </div> 
+            </main>
+            </div>
+        </div>
+    </div>
+
+</body>
+{% endif %}
+</html>

@@ -1,0 +1,26 @@
+review{
+    margin:0 auto 6em auto;
+    width:50%;
+    display: none;
+}
+
+.hotel_img{
+    width: 6em;
+    height: 6em;
+    border-radius: 10em;
+    border-style: solid;
+    float: left;
+    margin-left:30em;
+    margin-bottom:0em;
+    margin-right: 3em;
+    transition:.5s;
+}
+.hotel_img:hover{
+    transform:scale(1.3);
+}
+
+.hotel_para{
+    font-size: 1.3em;
+    width:80%;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}

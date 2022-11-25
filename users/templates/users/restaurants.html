@@ -1,0 +1,199 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static 'fonts/fontawesome/css/all.min.css' %}" type="text/css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <title>Document</title>
+</head>
+{%if user.is_authenticated%}
+<body>
+    <div id="app">
+    <nav class="navbar navbar-dark bg-dark shadow-lg">
+        <div class="container">
+          <a class="navbar-brand mt-2 mb-2" style="font-size: x-large;"href="#">Restaurants</a>
+        </div>
+        <div class="col-lg  col-md-6 col-sm-12 col">
+            <div class="input-group w-100">
+                <input type="text" class="form-control" style="width:60%;" placeholder="Search" v-model="keyword">
+                <div class="input-group-append">
+                    <button class="btn btn-secondary" v-on:click="getkey()"><i class="fa fa-search"></i></button>
+                </div>
+            </div>
+        </div> <!-- col.// -->
+    </nav>
+    <div>
+        <div class="container">
+            <div class="row mt-5 pt-3">
+                <div class="col-md-4">
+                    <label>Select city</label>
+                    <select class="form-control" v-model="location">
+                        <option selected>Choose</option>
+                        <option value="Hyderabad">Hyderabad</option>
+                        <option value="Mumbai">Mumbai</option>
+                        <option value="Kolkata">Kolkata</option>
+                        <option value="Bangalore">Bangalore</option>
+                        <option value="Chennai">Chennai</option>
+                        <option value="Delhi">Delhi</option>
+                        <option value="Nashik">Nashik</option>
+                        <option value="Pune">Pune</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label>Select Rating</label>
+                    <select class="form-control" v-model="rating">
+                        <option selected>Choose</option>
+                        <option value="2.0">Above 2.0</option>
+                        <option value="2.5">Above 2.5</option>
+                        <option value="3.0">Above 3.0</option>
+                        <option value="3.5">Above 3.5</option>
+                        <option value="4.0">Above 4.0</option>
+                        <option value="4.5">Above 4.5</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <br>
+                    <button class="btn btn-dark" v-on:click="getRest()">Submit</button>
+                </div>
+                <div class="col-md-2">
+                    <br>
+                    <a href="{% url 'home' %}" class="btn btn-dark">Back to Home</a>
+                </div>
+    
+            </div>
+    
+            <div class="row mt-5 pt-5">
+                <div class="col-md-3 my-3" v-for="restaurant in restaurants">
+                    <div class="card shadow-lg" style="width: 18rem;">
+                        <img :src="restaurant.image"
+                            class="card-img-top" alt=".." style="height:200px">
+                        <div class="card-body">
+                            <h5 class="card-title">[[restaurant.name]] </h5>
+                            <p class="card-text">[[(restaurant.description).substring(0 , 150)]]...</p>
+                            <i class="fa fa-star">  [[restaurant.rating]] out of 5</i> <br>
+                            <a href="#" class="btn btn-danger btn-sm mt-2">[[restaurant.location]]</a>
+                            <a href="{% url 'restaurantreviews' %}" class="btn btn-dark btn-sm mt-2">Add a Review</a>
+                        </div>
+                    </div>
+                </div>
+            
+                {% comment %} <div class="col-md-3" v-for="restaurant in searchrestaurants">
+                    <div class="card shadow-lg" style="width: 18rem;">
+                        <img :src="restaurant.image"
+                            class="card-img-top" alt=".." style="height:200px">
+                        <div class="card-body">
+                            <h5 class="card-title">[[restaurant.name]] </h5>
+                            <p class="card-text">[[(restaurant.description).substring(0 , 10000)]]</p>
+                            <p class="card-text">[[restaurant.rating]] out of 5</p>
+                            <a href="#" class="btn btn-primary">[[restaurant.location]]</a>
+                        </div>
+                    </div>
+                </div> {% endcomment %}
+            </div>
+
+            {% comment %} <div class="row">
+                {% if restaurants %}
+                {% for restaurant in restaurants %}
+                <div class="col-md-4">
+                    <div class="card shadow-lg" style="width: 18rem;">
+                        <img :src="restaurant.image"
+                            class="card-img-top" alt=".." style="height:200px">
+                        <div class="card-body">
+                            <h5 class="card-title">{{restaurant.name}} </h5>
+                            <p class="card-text">{{restaurant.description}}</p>
+                            <p class="card-text">{{restaurant.rating}} out of 5</p>
+                            <a href="#" class="btn btn-primary">{{restaurant.location}}</a>
+                        </div>
+                    </div>
+                </div> <!-- col.// -->
+                {% endfor %}
+                {% else %}
+                <div>
+                    <h2>No result found. Please try again.</h2>
+                </div>
+                {% endif %}
+            </div> <!-- row end.// --> {% endcomment %}
+        </div>
+    </div>
+</div>
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            delimiters: ['[[', ']]'],
+            data() {
+                return {
+                    location:'',
+                    rating:'',
+                    keyword:'',
+                    tasks: [],
+                    restaurants : [],
+                    searchrestaurants : []
+                }
+            },
+            created() {
+                this.getLoad();
+            },
+            methods : {
+                getRest(){
+                    if(this.location == ''){
+                        alert('location cannot be null');
+                        return;
+                    }
+                    fetch(`/api_r/get/?location=${this.location}&rating=${this.rating}`)
+                    .then(result => result.json())
+                    .then(response => {
+                        this.restaurants = response
+                    })
+                },
+                getkey()
+                {
+                    fetch(`/search_r/?keyword=${this.keyword}`)
+                    .then(result => result.json())
+                    .then(response => {
+                        this.restaurants = response
+                    })
+                },
+                getLoad(){
+                    fetch(`/load_r`)
+                    .then(result => result.json())
+                    .then(response => {
+                        this.restaurants = response
+                    })
+                }
+            }
+        });
+    </script>
+
+</body>
+{%else%}
+<body>
+    <br><br><br><br><br><br>
+    <div class="col d-flex justify-content-center" >
+        <div class="card" style="width: 30rem; text-align: center;">
+            <div class="card-body">
+            <main>
+                    <div class="alert alert-dark" role="alert">
+                        <div style="font-size: 150%">
+                                You need to be logged in to visit this page
+                        </div>
+                        <div class="card-footer text-center">
+                            <div class="small">
+                                <a href="{% url 'login' %}">
+                                    Go to the login page</a>
+                            </div>
+                        </div>
+                    </div> 
+            </main>
+            </div>
+        </div>
+    </div>
+
+</body>
+{% endif %}
+</html>
