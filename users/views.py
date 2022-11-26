@@ -171,7 +171,7 @@ def search_r(request):
         result['link']=restaurant_obj.link
         result['location']=restaurant_obj.location
         payload.append(result)
-        if not (keyword in result['name']) and not(keyword in result['description']) and not(keyword in result['location']):
+        if not (keyword in result['name'].lower()) and not(keyword in result['description'].lower()) and not(keyword in result['location'].lower()):
             payload.pop()
     return JsonResponse(payload, safe=False)
 
@@ -192,7 +192,7 @@ def search_h(request):
         result['link']=restaurant_obj.link
         result['location']=restaurant_obj.location
         payload.append(result)
-        if not (keyword in result['name']) and not(keyword in result['description']) and not(keyword in result['location']):
+        if not (keyword in result['name'].lower()) and not(keyword in result['description'].lower()) and not(keyword in result['location'].lower()):
             payload.pop()
     return JsonResponse(payload, safe=False)
 
@@ -212,7 +212,7 @@ def search_m(request):
         result['link']=movie_obj.link
         result['language']=movie_obj.language
         payload.append(result)
-        if not (keyword in result['name']) and not(keyword in result['description']) and not(keyword in result['Genre']):
+        if not (keyword in result['name'].lower()) and not(keyword in result['description'].lower()) and not(keyword in result['Genre'].lower()):
             payload.pop()
     return JsonResponse(payload, safe=False)
    
